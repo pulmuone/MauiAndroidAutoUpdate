@@ -138,6 +138,8 @@ namespace MauiAndroidAutoUpdate.Platforms.Android
 
             // Registers BroadcastReceiver to respond to completed downloads.
             var filter = new IntentFilter(DownloadManager.ActionDownloadComplete);
+            filter.AddCategory(Intent.CategoryDefault);
+
             receiver = new DownloadReceiver();
             receiver.DownloadCompleted += Receiver_DownloadCompleted;
 
@@ -189,6 +191,9 @@ namespace MauiAndroidAutoUpdate.Platforms.Android
         }
 
         public delegate void DownloadCompletedEventHandler();
+
+        //java.lang.SecurityException 버그 Issue 처리
+        [BroadcastReceiver(Exported = true)] // Specify the export flag
         private class DownloadReceiver : BroadcastReceiver
         {
             public event DownloadCompletedEventHandler DownloadCompleted;
