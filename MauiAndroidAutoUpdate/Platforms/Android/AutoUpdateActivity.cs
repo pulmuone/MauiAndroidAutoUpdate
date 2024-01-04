@@ -59,18 +59,20 @@ namespace MauiAndroidAutoUpdate.Platforms.Android
 
             Task.Run(async () =>
             {
+                var query = new DownloadManager.Query();
                 for (; ; )
                 {
-                    var query = new DownloadManager.Query();
                     query.SetFilterById(downloadId);
                     ICursor cursor = manager.InvokeQuery(query);
                     if (cursor.MoveToFirst())
                     {
                         var soFar = cursor.GetDouble(cursor.GetColumnIndex(DownloadManager.ColumnBytesDownloadedSoFar));
                         var total = cursor.GetDouble(cursor.GetColumnIndex(DownloadManager.ColumnTotalSizeBytes));
+
                         RunOnUiThread(() =>
                         {
-                            if (Build.VERSION.SdkInt >= OS.BuildVersionCodes.N)
+                            //if (Build.VERSION.SdkInt >= OS.BuildVersionCodes.N)
+                            if (OperatingSystem.IsAndroidVersionAtLeast(24))
                             {
                                 progressBar.SetProgress(System.Convert.ToInt32(soFar / total * 100), true);
                             }
@@ -143,7 +145,15 @@ namespace MauiAndroidAutoUpdate.Platforms.Android
             receiver = new DownloadReceiver();
             receiver.DownloadCompleted += Receiver_DownloadCompleted;
 
-            RegisterReceiver(receiver, filter);
+            //if (Build.VERSION.SdkInt >= OS.BuildVersionCodes.Tiramisu)
+            if (OperatingSystem.IsAndroidVersionAtLeast(33))
+            {
+                RegisterReceiver(receiver, filter, ReceiverFlags.Exported);
+            }
+            else
+            {
+                RegisterReceiver(receiver, filter);
+            }                
         }
 
         protected override void OnPause()

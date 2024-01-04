@@ -1,6 +1,7 @@
 ﻿using Android.Content;
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
+using Application = Android.App.Application;
 
 namespace MauiAndroidAutoUpdate.Platforms.Android.Handlers
 {
@@ -19,6 +20,7 @@ namespace MauiAndroidAutoUpdate.Platforms.Android.Handlers
 
             var activity = this.Context;
             var intent = new Intent(activity, typeof(AutoUpdateActivity));
+            intent.SetPackage(Application.Context.PackageName);
 
             try
             {
