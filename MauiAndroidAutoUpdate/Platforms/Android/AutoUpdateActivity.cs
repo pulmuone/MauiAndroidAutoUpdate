@@ -57,7 +57,7 @@ namespace MauiAndroidAutoUpdate.Platforms.Android
 
             downloadId = manager.Enqueue(request);
 
-            Task.Run(async () =>
+            ThreadPool.QueueUserWorkItem(async o =>
             {
                 var query = new DownloadManager.Query();
                 for (; ; )
@@ -163,6 +163,7 @@ namespace MauiAndroidAutoUpdate.Platforms.Android
             // Unregister the BroadcastReceiver when app is destroyed.
             if (receiver != null)
             {
+                receiver.DownloadCompleted -= Receiver_DownloadCompleted;
                 UnregisterReceiver(receiver);
             }
         }

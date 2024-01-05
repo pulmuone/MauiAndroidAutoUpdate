@@ -17,24 +17,6 @@ namespace MauiAndroidAutoUpdate.Platforms.Android.Handlers
         public override void SetVirtualView(IView view)
         {
             base.SetVirtualView(view);
-
-            var activity = this.Context;
-            var intent = new Intent(activity, typeof(AutoUpdateActivity));
-            intent.SetPackage(Application.Context.PackageName);
-
-            try
-            {
-                AutoUpdateActivity.OnUpdateCompleted += () =>
-                {
-                    (view as ContentPage).Navigation.PopAsync();
-                };
-
-                activity.StartActivity(intent);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
         }
 
         //#3,
@@ -46,11 +28,32 @@ namespace MauiAndroidAutoUpdate.Platforms.Android.Handlers
         //#4, 네이티브 뷰 설정
         protected override void ConnectHandler(ContentViewGroup platformView)
         {
-            base.ConnectHandler(PlatformView);
+            base.ConnectHandler(platformView);
             // Perform any control setup here
 
+            var activity = this.Context;
+            var intent = new Intent(activity, typeof(AutoUpdateActivity));
+            intent.SetPackage(Application.Context.PackageName);
+
+            try
+            {
+                AutoUpdateActivity.OnUpdateCompleted += () =>
+                {
+                    if (VirtualView != null)
+                    {
+                        (VirtualView as ContentPage).Navigation.PopAsync();
+                    }
+                };
+
+                activity.StartActivity(intent);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
+        //NET Maui would never internally call this you need to!!!
         protected override void DisconnectHandler(ContentViewGroup platformView)
         {
             platformView.Dispose();
