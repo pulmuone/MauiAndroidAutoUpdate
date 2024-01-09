@@ -41,7 +41,7 @@ namespace MauiAndroidAutoUpdate.Platforms.Android.Handlers
                 {
                     if (VirtualView != null)
                     {
-                        (VirtualView as ContentPage).Navigation.PopAsync();
+                        //(VirtualView as ContentPage).Navigation.PopAsync();
                     }
                 };
 
@@ -56,7 +56,7 @@ namespace MauiAndroidAutoUpdate.Platforms.Android.Handlers
         //NET Maui would never internally call this you need to!!!
         protected override void DisconnectHandler(ContentViewGroup platformView)
         {
-            platformView.Dispose();
+            platformView?.Dispose();
             base.DisconnectHandler(platformView);
         }
 

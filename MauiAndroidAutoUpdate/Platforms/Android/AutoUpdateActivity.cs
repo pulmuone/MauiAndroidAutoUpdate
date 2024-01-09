@@ -1,5 +1,6 @@
 ﻿using Android.App;
 using Android.Content;
+using Android.Content.PM;
 using Android.Database;
 using Android.OS;
 using Android.Widget;
@@ -23,6 +24,7 @@ namespace MauiAndroidAutoUpdate.Platforms.Android
         private ProgressBar progressBar;
         private TextView textView1;
 
+        private static String PACKAGE_INSTALLED_ACTION = "com.example.android.apis.content.SESSION_API_PACKAGE_INSTALLED";
         public object Content { get; private set; }
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -98,6 +100,86 @@ namespace MauiAndroidAutoUpdate.Platforms.Android
 
         private void Receiver_DownloadCompleted()
         {
+            //1. 기존 사용하던 방법, "설치중입니다." 가운데 알림창 표시됨.
+            //InstallApk();
+
+            //2. package installer Session 사용, "설치중입니다." 가운데 표시되는 알림창을 보여주지 않고 설치함.
+            // progressBar 보여주지 않고 DownloadManager만 사용하여 업데이트된 apk파일 다운로드 되는 것을 보여주지 않고 개발.
+            InstallApkSession();
+        }
+
+        //https://android.googlesource.com/platform/development/+/refs/heads/main/samples/ApiDemos/src/com/example/android/apis/content/InstallApkSessionApi.java
+        private void InstallApkSession()
+        {
+            Java.IO.File path = this.GetExternalFilesDir(OS.Environment.DirectoryDownloads);
+
+            PackageInstaller.Session session = null;
+
+            try
+            {
+                PackageInstaller packageInstaller = PackageManager.PackageInstaller;
+                PackageInstaller.SessionParams _params = new PackageInstaller.SessionParams(PackageInstallMode.FullInstall);
+                _params.SetAppPackageName(AppInfo.Current.PackageName);
+                //_params.SetDontKillApp(true); //Android34이상 지원
+
+                int sessionId = packageInstaller.CreateSession(_params);
+                session = packageInstaller.OpenSession(sessionId);
+
+                var packageInSession = session.OpenWrite(AppInfo.Current.PackageName, 0, -1);
+
+                var apkUri = AndroidX.Core.Content.FileProvider.GetUriForFile(
+                                this.ApplicationContext,
+                                string.Format("{0}{1}", AppInfo.Current.PackageName, ".fileprovider"),
+                                new Java.IO.File(path, string.Format("{0}{1}", AppInfo.Current.PackageName, ".apk")));
+
+                var input = this.ContentResolver.OpenInputStream(apkUri);
+
+                if (input != null)
+                {
+                    input.CopyTo(packageInSession);
+                }
+                //session.Fsync(packageInSession);
+                packageInSession.Close();
+                input.Close();
+
+                // Create an install status receiver.
+                Intent intent = new Intent(this, this.Class);
+                intent.SetAction(PACKAGE_INSTALLED_ACTION);
+                // SingleTop만 있으면 된다고 하나 아래값 다 추가 해줌.
+                intent.AddFlags(ActivityFlags.GrantReadUriPermission | ActivityFlags.NewTask | ActivityFlags.SingleTop | ActivityFlags.ClearTop);
+
+                //https://developer.android.com/topic/security/risks/pending-intent?hl=ko#kotlin
+                PendingIntentFlags piFlag = 0;
+
+                if (OperatingSystem.IsAndroidVersionAtLeast(31))
+                {
+                    piFlag = PendingIntentFlags.Mutable; //31이상에서 필수값 지정해야함. Mutable 아닐경우 업데이트 안 됨.
+                }
+
+                PendingIntent pendingIntent = PendingIntent.GetActivity(this, 0, intent, piFlag);
+                IntentSender statusReceiver = pendingIntent.IntentSender;
+
+                // commit하면 백그라운드에서 설치작업 진행되고, 완료 되면 앱 강제 종료 됨.
+                session.Commit(statusReceiver);
+                //https://developer.android.com/reference/android/content/pm/PackageInstaller.Session#commit(android.content.IntentSender)
+            }
+            catch (Java.IO.IOException ex)
+            {
+                if (session != null)
+                {
+                    session.Abandon();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Console.WriteLine(ex.Message);
+            }
+        }
+
+        //기존 사용하던 방법
+        //Android 기본 샘플 https://android.googlesource.com/platform/development/+/refs/heads/main/samples/ApiDemos/src/com/example/android/apis/content/InstallApk.java
+        private void InstallApk()
+        {
             Java.IO.File path = this.GetExternalFilesDir(OS.Environment.DirectoryDownloads);
             try
             {
@@ -130,9 +212,10 @@ namespace MauiAndroidAutoUpdate.Platforms.Android
             finally
             {
                 //await Task.Delay(500);
-                this.Finish();
+                //this.Finish();
             }
         }
+
 
         protected override void OnResume()
         {
@@ -153,7 +236,7 @@ namespace MauiAndroidAutoUpdate.Platforms.Android
             else
             {
                 RegisterReceiver(receiver, filter);
-            }                
+            }
         }
 
         protected override void OnPause()
@@ -197,6 +280,36 @@ namespace MauiAndroidAutoUpdate.Platforms.Android
                             }
                         }
                     }
+                }
+            }
+        }
+
+        protected override void OnNewIntent(Intent intent)
+        {
+            Bundle extras = intent.Extras;
+            if (PACKAGE_INSTALLED_ACTION.Equals(intent.Action))
+            {
+                var status = extras.GetInt(PackageInstaller.ExtraStatus);
+                var message = extras.GetString(PackageInstaller.ExtraStatusMessage);
+                switch (status)
+                {
+                    case (int)PackageInstallStatus.PendingUserAction:
+                        // Ask user to confirm the installation
+                        var confirmIntent = (Intent)extras.Get(Intent.ExtraIntent);
+                        StartActivity(confirmIntent);
+                        break;
+                    case (int)PackageInstallStatus.Success:
+                        //TODO: Handle success
+                        break;
+                    case (int)PackageInstallStatus.Failure:
+                    case (int)PackageInstallStatus.FailureAborted:
+                    case (int)PackageInstallStatus.FailureBlocked:
+                    case (int)PackageInstallStatus.FailureConflict:
+                    case (int)PackageInstallStatus.FailureIncompatible:
+                    case (int)PackageInstallStatus.FailureInvalid:
+                    case (int)PackageInstallStatus.FailureStorage:
+                        //TODO: Handle failures
+                        break;
                 }
             }
         }
