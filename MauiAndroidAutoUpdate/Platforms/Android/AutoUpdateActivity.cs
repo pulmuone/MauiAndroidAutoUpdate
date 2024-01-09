@@ -284,6 +284,7 @@ namespace MauiAndroidAutoUpdate.Platforms.Android
             }
         }
 
+        //InstallApkSession 사용
         protected override void OnNewIntent(Intent intent)
         {
             Bundle extras = intent.Extras;
