@@ -101,11 +101,11 @@ namespace MauiAndroidAutoUpdate.Platforms.Android
         private void Receiver_DownloadCompleted()
         {
             //1. 기존 사용하던 방법, "설치중입니다." 가운데 알림창 표시됨.
-            //InstallApk();
+            InstallApk();
 
             //2. package installer Session 사용, "설치중입니다." 가운데 표시되는 알림창을 보여주지 않고 설치함.
             // progressBar 보여주지 않고 DownloadManager만 사용하여 업데이트된 apk파일 다운로드 되는 것을 보여주지 않고 개발.
-            InstallApkSession();
+            //InstallApkSession();
         }
 
         //https://android.googlesource.com/platform/development/+/refs/heads/main/samples/ApiDemos/src/com/example/android/apis/content/InstallApkSessionApi.java
@@ -195,6 +195,7 @@ namespace MauiAndroidAutoUpdate.Platforms.Android
                                         new Java.IO.File(path, string.Format("{0}{1}", Application.Context.PackageName, ".apk")));
 
                     intent.SetDataAndType(apkUri, this.ContentResolver.GetType(apkUri));
+
                     StartActivity(intent);
                 }
                 else
@@ -213,7 +214,7 @@ namespace MauiAndroidAutoUpdate.Platforms.Android
             finally
             {
                 //await Task.Delay(500);
-                //this.Finish();
+                this.Finish();
             }
         }
 
@@ -251,7 +252,7 @@ namespace MauiAndroidAutoUpdate.Platforms.Android
                 UnregisterReceiver(receiver);
             }
         }
-
+         
         protected override void OnDestroy()
         {
             base.OnDestroy();

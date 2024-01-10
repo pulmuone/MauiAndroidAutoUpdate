@@ -41,7 +41,7 @@ namespace MauiAndroidAutoUpdate.Platforms.Android.Handlers
                 {
                     if (VirtualView != null)
                     {
-                        //(VirtualView as ContentPage).Navigation.PopAsync();
+                        (VirtualView as ContentPage).Navigation.PopAsync();
                     }
                 };
 
@@ -54,19 +54,19 @@ namespace MauiAndroidAutoUpdate.Platforms.Android.Handlers
         }
 
         //NET Maui would never internally call this you need to!!!
-        protected override void DisconnectHandler(ContentViewGroup platformView)
-        {
-            try
-            {
-                base.DisconnectHandler(platformView);
-                platformView?.Dispose();
-            }
-            catch(Exception ex)
-            {
+        //protected override void DisconnectHandler(ContentViewGroup platformView)
+        //{
+        //    try
+        //    {
+        //        base.DisconnectHandler(platformView); //base를 먼저 호출한다.
+        //        platformView?.Dispose();
+        //    }
+        //    catch (Exception ex)
+        //    {
 
-            }
+        //    }
 
-        }
+        //}
 
     }
 }

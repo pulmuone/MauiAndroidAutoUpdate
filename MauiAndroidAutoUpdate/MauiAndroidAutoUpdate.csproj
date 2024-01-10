@@ -32,8 +32,13 @@
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
 		<RuntimeIdentifiers>android-arm;android-arm64</RuntimeIdentifiers>
 	    <AndroidPackageFormat>apk</AndroidPackageFormat>
-	    <RunAOTCompilation>False</RunAOTCompilation>
-	    <PublishTrimmed>False</PublishTrimmed>
+	    <RunAOTCompilation>True</RunAOTCompilation>
+	    <PublishTrimmed>True</PublishTrimmed>
+	    <AndroidStoreUncompressedFileExtensions>.mp3</AndroidStoreUncompressedFileExtensions>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|AnyCPU'">
+	  <AndroidStoreUncompressedFileExtensions></AndroidStoreUncompressedFileExtensions>
 	</PropertyGroup>
 
 
