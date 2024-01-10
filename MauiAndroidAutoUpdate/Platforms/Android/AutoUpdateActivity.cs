@@ -146,7 +146,8 @@ namespace MauiAndroidAutoUpdate.Platforms.Android
                 Intent intent = new Intent(this, this.Class);
                 intent.SetAction(PACKAGE_INSTALLED_ACTION);
                 // SingleTop만 있으면 된다고 하나 아래값 다 추가 해줌.
-                intent.AddFlags(ActivityFlags.GrantReadUriPermission | ActivityFlags.NewTask | ActivityFlags.SingleTop | ActivityFlags.ClearTop);
+                //intent.AddFlags(ActivityFlags.GrantReadUriPermission | ActivityFlags.NewTask | ActivityFlags.SingleTop | ActivityFlags.ClearTop);
+                intent.AddFlags(ActivityFlags.GrantReadUriPermission | ActivityFlags.SingleTop );
 
                 //https://developer.android.com/topic/security/risks/pending-intent?hl=ko#kotlin
                 PendingIntentFlags piFlag = 0;
@@ -257,6 +258,7 @@ namespace MauiAndroidAutoUpdate.Platforms.Android
             OnUpdateCompleted?.Invoke();
             OnUpdateCompleted = null;
         }
+
         private void FileDelete()
         {
             Java.IO.File file = this.GetExternalFilesDir(OS.Environment.DirectoryDownloads);
@@ -295,11 +297,14 @@ namespace MauiAndroidAutoUpdate.Platforms.Android
                 switch (status)
                 {
                     case (int)PackageInstallStatus.PendingUserAction:
+                        Toast.MakeText(this, "PendingUserAction " + status + ", " + message, ToastLength.Short).Show();
+                        // This test app isn't privileged, so the user has to confirm the install.
                         // Ask user to confirm the installation
                         var confirmIntent = (Intent)extras.Get(Intent.ExtraIntent);
                         StartActivity(confirmIntent);
                         break;
                     case (int)PackageInstallStatus.Success:
+                        Toast.MakeText(this, "Success " + status + ", " + message, ToastLength.Short).Show();
                         //TODO: Handle success
                         break;
                     case (int)PackageInstallStatus.Failure:

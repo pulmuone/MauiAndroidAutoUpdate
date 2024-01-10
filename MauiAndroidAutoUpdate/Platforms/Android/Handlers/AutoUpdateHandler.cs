@@ -56,8 +56,16 @@ namespace MauiAndroidAutoUpdate.Platforms.Android.Handlers
         //NET Maui would never internally call this you need to!!!
         protected override void DisconnectHandler(ContentViewGroup platformView)
         {
-            platformView?.Dispose();
-            base.DisconnectHandler(platformView);
+            try
+            {
+                base.DisconnectHandler(platformView);
+                platformView?.Dispose();
+            }
+            catch(Exception ex)
+            {
+
+            }
+
         }
 
     }

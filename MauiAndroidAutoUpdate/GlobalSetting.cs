@@ -13,6 +13,7 @@ namespace MauiAndroidAutoUpdate
         {
             ApkUri = "http://app.test.com/com.gwise.test.apk"; //웹서버에 MIME형식 추가 (.apk, application/vnd.android.package-archive)
             ApkVerUri = "http://app.test.com/version.txt";
+
         }
 
         public static GlobalSetting Instance { get; } = new GlobalSetting();
