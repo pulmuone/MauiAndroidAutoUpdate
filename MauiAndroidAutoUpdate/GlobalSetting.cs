@@ -11,8 +11,11 @@ namespace MauiAndroidAutoUpdate
 
         public GlobalSetting()
         {
-            ApkUri = "http://app.test.com/com.gwise.test.apk"; //웹서버에 MIME형식 추가 (.apk, application/vnd.android.package-archive)
-            ApkVerUri = "http://app.test.com/version.txt";
+            //ApkUri = "http://app.test.com/com.gwise.test.apk"; //웹서버에 MIME형식 추가 (.apk, application/vnd.android.package-archive)
+            //ApkVerUri = "http://app.test.com/version.txt";
+
+            ApkUri = "http://219.254.35.79:20000/com.gwise.test.apk";
+            ApkVerUri = "http://219.254.35.79:20000/version.txt";
         }
 
         public static GlobalSetting Instance { get; } = new GlobalSetting();

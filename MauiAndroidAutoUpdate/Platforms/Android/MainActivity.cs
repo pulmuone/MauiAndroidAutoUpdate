@@ -19,8 +19,7 @@ public class MainActivity : MauiAppCompatActivity
 
     static string[] PERMISSIONS = {
             Manifest.Permission.ReadExternalStorage,
-            Manifest.Permission.WriteExternalStorage,
-            Manifest.Permission.RequestInstallPackages
+            Manifest.Permission.WriteExternalStorage
         };
 
     protected override void OnCreate(Bundle savedInstanceState)
@@ -45,7 +44,6 @@ public class MainActivity : MauiAppCompatActivity
         }
     }
 
-
     protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
     {
         base.OnActivityResult(requestCode, resultCode, data);
@@ -58,8 +56,7 @@ public class MainActivity : MauiAppCompatActivity
 
     private void SettingPermission()
     {
-        //if (Build.VERSION.SdkInt >= BuildVersionCodes.M && Build.VERSION.SdkInt <= BuildVersionCodes.P) //23~28
-        if (Build.VERSION.SdkInt >= BuildVersionCodes.M)
+        if (Build.VERSION.SdkInt >= BuildVersionCodes.M && Build.VERSION.SdkInt <= BuildVersionCodes.P) //23~28
         {
             var permissionList = new List<string>();
 
