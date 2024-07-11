@@ -257,7 +257,7 @@ namespace MauiAndroidAutoUpdate.Platforms.Android
         {
             base.OnDestroy();
             OnUpdateCompleted?.Invoke();
-            OnUpdateCompleted = null;
+            //OnUpdateCompleted = null;
         }
 
         private void FileDelete()

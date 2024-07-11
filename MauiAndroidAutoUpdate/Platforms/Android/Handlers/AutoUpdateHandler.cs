@@ -37,11 +37,11 @@ namespace MauiAndroidAutoUpdate.Platforms.Android.Handlers
 
             try
             {
-                AutoUpdateActivity.OnUpdateCompleted += () =>
+                AutoUpdateActivity.OnUpdateCompleted += async () =>
                 {
                     if (VirtualView != null)
                     {
-                        (VirtualView as ContentPage).Navigation.PopAsync(); // InstallApkSession 방식을 사용할 경우 주석처리
+                        await (VirtualView as ContentPage).Navigation.PopModalAsync(); // InstallApkSession 방식을 사용할 경우 주석처리
                     }
                 };
 
