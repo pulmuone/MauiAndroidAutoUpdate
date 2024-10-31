@@ -41,7 +41,15 @@ namespace MauiAndroidAutoUpdate.Platforms.Android.Handlers
                 {
                     if (VirtualView != null)
                     {
-                        await (VirtualView as ContentPage).Navigation.PopModalAsync(); // InstallApkSession 방식을 사용할 경우 주석처리
+
+                        //(VirtualView as ContentPage).Navigation.PopAsync(); //PackageInstaller는 주석처리
+                        //await (VirtualView as ContentPage).Navigation.PopModalAsync();
+
+                        await (VirtualView as BindableObject).Dispatcher.DispatchAsync(async () =>
+                        //await Device.InvokeOnMainThreadAsync(async () =>
+                        {
+                            await (VirtualView as ContentPage).Navigation.PopModalAsync();
+                        });
                     }
                 };
 
