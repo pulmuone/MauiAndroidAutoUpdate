@@ -213,7 +213,7 @@ namespace MauiAndroidAutoUpdate.Platforms.Android
             }
             finally
             {
-                //await Task.Delay(500);
+                Task.Delay(500);
                 this.Finish();
             }
         }
